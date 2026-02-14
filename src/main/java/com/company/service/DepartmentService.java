@@ -5,6 +5,8 @@ import com.company.entity.Department;
 import com.company.exception.ResourceNotFoundException;
 import com.company.repository.CompanyRepository;
 import com.company.repository.DepartmentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,36 +23,40 @@ public class DepartmentService {
         this.companyRepository = companyRepository;
     }
 
-    public Department createDepartment(Long companyId, Department department){
+    public Department createDepartment(Long companyId, Department department) {
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(()->new ResourceNotFoundException("Company not found with id: " + companyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + companyId));
 
         department.setCompany(company);
 
         return departmentRepository.save(department);
     }
 
-    public List<Department> getAllDepartments(){
+    public List<Department> getAllDepartments() {
         return departmentRepository.findAll();
     }
 
-    public Department getDepartmentById(Long id){
-        return departmentRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + id));
+    public Page<Department> getAllDepartmentPaginated(Pageable pageable) {
+        return departmentRepository.findAll(pageable);
     }
 
-    public Department updateDepartment(Long id, Department department){
+    public Department getDepartmentById(Long id) {
+        return departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+    }
+
+    public Department updateDepartment(Long id, Department department) {
         Department existing = departmentRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
 
         existing.setName(department.getName());
 
         return departmentRepository.save(existing);
     }
 
-    public Department deleteDepartment(Long id){
+    public Department deleteDepartment(Long id) {
         Department department = departmentRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Department not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
 
         departmentRepository.delete(department);
 

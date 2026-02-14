@@ -6,8 +6,13 @@ import com.company.entity.Project;
 import com.company.mapper.ProjectMapper;
 import com.company.payload.ApiResponse;
 import com.company.service.DepartmentService;
+import com.company.service.EmployeeService;
 import com.company.service.ProjectService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,9 +22,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/projects")
@@ -27,11 +35,13 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final DepartmentService departmentService;
+    private final EmployeeService employeeService;
 
     public ProjectController(ProjectService projectService,
-                             DepartmentService departmentService) {
+                             DepartmentService departmentService, EmployeeService employeeService) {
         this.projectService = projectService;
         this.departmentService = departmentService;
+        this.employeeService = employeeService;
     }
 
     @PostMapping("/{departmentId}")
@@ -58,6 +68,41 @@ public class ProjectController {
                 .toList();
 
         ApiResponse<List<ProjectDto>> response = new ApiResponse<>(HttpStatus.OK.value(), "Projects Fetched Successfully", projects);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAllProjectsPaginated(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(direction, sortBy));
+
+        Page<Project> projectPage = projectService.getAllProjectsPaginated(pageable);
+
+        List<ProjectDto> projects = projectPage
+                .getContent()
+                .stream()
+                .map(ProjectMapper::toDto)
+                .toList();
+
+        Map<String, Object> responseData = new HashMap<>();
+
+        responseData.put("content", projects);
+        responseData.put("currentPage", projectPage.getNumber());
+        responseData.put("totalItems", projectPage.getTotalElements());
+        responseData.put("totalPages", projectPage.getTotalPages());
+        responseData.put("pageSize", projectPage.getSize());
+        responseData.put("last", projectPage.isLast());
+
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>(HttpStatus.OK.value(), "Project Retried successfully", responseData);
 
         return ResponseEntity.ok(response);
     }

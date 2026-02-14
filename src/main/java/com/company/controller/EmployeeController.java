@@ -8,6 +8,10 @@ import com.company.payload.ApiResponse;
 import com.company.service.EmployeeService;
 import com.company.service.ProjectService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,9 +21,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/employees")
@@ -58,6 +65,44 @@ public class EmployeeController {
                 .toList();
 
         ApiResponse<List<EmployeeDto>> response = new ApiResponse<>(HttpStatus.OK.value(), "Employee Fetched Successfully", employees);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAllEmployeesPaginated(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(direction, sortBy));
+
+        Page<Employee> employeePage = employeeService.getAllEmployeesPaginated(pageable);
+
+        List<EmployeeDto> employees = employeePage
+                .getContent()
+                .stream()
+                .map(EmployeeMapper::toDto)
+                .toList();
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("content", employees);
+        responseData.put("currentPage", employeePage.getNumber());
+        responseData.put("totalItems", employeePage.getTotalElements());
+        responseData.put("totalPages", employeePage.getTotalPages());
+        responseData.put("pageSize", employeePage.getSize());
+        responseData.put("last", employeePage.isLast());
+
+        ApiResponse<Map<String, Object>> response = new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "Employee Fetched Successfully",
+                responseData
+        );
 
         return ResponseEntity.ok(response);
     }
