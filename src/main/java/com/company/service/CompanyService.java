@@ -1,7 +1,6 @@
 package com.company.service;
 
 import com.company.entity.Company;
-import com.company.entity.Department;
 import com.company.exception.ResourceNotFoundException;
 import com.company.repository.CompanyRepository;
 import org.springframework.data.domain.Page;
@@ -31,14 +30,14 @@ public class CompanyService {
         return companyRepository.findAll(pageable);
     }
 
-    public Company getCompanyById(Long id){
+    public Company getCompanyById(Long id) {
         return companyRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Company not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
     }
 
-    public Company updateCompany(Long id, Company company){
+    public Company updateCompany(Long id, Company company) {
         Company existing = companyRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Company not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
 
         existing.setName(company.getName());
         existing.setLocation(company.getLocation());
@@ -46,9 +45,9 @@ public class CompanyService {
         return companyRepository.save(existing);
     }
 
-    public Company deleteCompany(Long id){
+    public Company deleteCompany(Long id) {
         Company company = companyRepository.findById(id)
-                .orElseThrow(()->new ResourceNotFoundException("Company not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));
 
         companyRepository.delete(company);
 

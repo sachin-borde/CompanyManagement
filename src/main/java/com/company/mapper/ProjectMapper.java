@@ -6,9 +6,9 @@ import com.company.entity.Project;
 
 public class ProjectMapper {
 
-    public static Project toEntity(ProjectDto dto, Department department){
+    public static Project toEntity(ProjectDto dto, Department department) {
 
-        Project project=new Project();
+        Project project = new Project();
 
         project.setName(dto.getName());
         project.setBudget(dto.getBudget());
@@ -18,9 +18,9 @@ public class ProjectMapper {
 
     }
 
-    public static ProjectDto toDto(Project project){
+    public static ProjectDto toDto(Project project) {
 
-        ProjectDto dto=new ProjectDto();
+        ProjectDto dto = new ProjectDto();
 
         dto.setId(project.getId());
         dto.setName(project.getName());

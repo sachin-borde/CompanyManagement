@@ -1,13 +1,16 @@
 package com.company.payload;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class ApiResponse<T> {
 
-    private LocalDateTime timestamp;
-    private int status;
-    private String message;
-    private T data;
+    private final LocalDateTime timestamp;
+    private final int status;
+    private final String message;
+    private final T data;
 
     public ApiResponse(int status, String message, T data) {
         this.timestamp = LocalDateTime.now();
@@ -16,19 +19,4 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
-    }
 }

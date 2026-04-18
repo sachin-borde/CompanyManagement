@@ -1,11 +1,8 @@
 package com.company.controller;
 
 import com.company.dtos.CompanyDto;
-import com.company.dtos.EmployeeDto;
 import com.company.entity.Company;
-import com.company.entity.Employee;
 import com.company.mapper.CompanyMapper;
-import com.company.mapper.EmployeeMapper;
 import com.company.payload.ApiResponse;
 import com.company.service.CompanyService;
 import jakarta.validation.Valid;
